@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
+	"time"
 )
 
 var (
@@ -52,4 +54,19 @@ func PrintModified(path string) {
 
 func PrintMatched(path string) {
 	Verbosef("%q: match", path)
+}
+
+func PrintVersion() {
+	info, _ := debug.ReadBuildInfo()
+	rev := ""
+	ts := time.Time{}
+	for _, s := range info.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			rev = s.Value
+		case "vcs.time":
+			ts, _ = time.Parse(time.RFC3339, s.Value)
+		}
+	}
+	Printf("summer version %s (%s)", rev, ts)
 }

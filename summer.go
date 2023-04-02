@@ -27,6 +27,8 @@ Usage:
   summer generate <dir>
       Write checksums for the given directory. Pre-existing checksums are
       overwritten without verification.
+  summer version
+      Print software version information.
 
 Flags:
 `
@@ -49,7 +51,7 @@ func main() {
 	op := flag.Arg(0)
 	root := flag.Arg(1)
 
-	if root == "" {
+	if op != "version" && root == "" {
 		Usage()
 		os.Exit(1)
 	}
@@ -70,6 +72,8 @@ func main() {
 		err = verify(db, root)
 	case "update":
 		err = update(db, root)
+	case "version":
+		PrintVersion()
 	default:
 		Fatalf("unknown command %q", op)
 	}

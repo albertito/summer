@@ -22,6 +22,8 @@ No arguments.
     summer generate <dir>
         Write checksums for the given directory. Pre-existing checksums are
         overwritten without verification.
+    summer version
+        Print software version information.
   
   Flags:
     -db string
@@ -51,6 +53,8 @@ Too few arguments.
     summer generate <dir>
         Write checksums for the given directory. Pre-existing checksums are
         overwritten without verification.
+    summer version
+        Print software version information.
   
   Flags:
     -db string
@@ -80,6 +84,8 @@ No valid path (the argument is given, but it is empty).
     summer generate <dir>
         Write checksums for the given directory. Pre-existing checksums are
         overwritten without verification.
+    summer version
+        Print software version information.
   
   Flags:
     -db string
@@ -94,3 +100,8 @@ Unknown command.
   $ summer badcommand .
   unknown command "badcommand"
   [1]
+
+Version information.
+
+  $ summer version
+  summer version \w+ \(....-..-.. ..:..:.. .*\) (re)
