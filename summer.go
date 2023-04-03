@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"syscall"
 )
 
 const usage = `# summer 🌞 🏖
@@ -34,7 +35,8 @@ Flags:
 `
 
 var (
-	dbPath = flag.String("db", "", "database to read from/write to")
+	dbPath        = flag.String("db", "", "database to read from/write to")
+	oneFilesystem = flag.Bool("x", false, "don't cross filesystem boundaries")
 )
 
 func Usage() {
@@ -94,39 +96,53 @@ type ChecksumV1 struct {
 	ModTimeUsec int64
 }
 
-func isFileRelevant(path string, d fs.DirEntry, err error) bool {
+func openAndInfo(path string, d fs.DirEntry, err error, rootDev uint64) (bool, *os.File, fs.FileInfo, error) {
 	if err != nil {
-		return false
+		return false, nil, nil, err
 	}
-	if d.IsDir() {
-		return false
+	if d.IsDir() || !d.Type().IsRegular() {
+		return false, nil, nil, nil
 	}
-	return d.Type().IsRegular()
-}
 
-func openAndInfo(path string, d fs.DirEntry) (*os.File, fs.FileInfo, error) {
 	info, err := d.Info()
 	if err != nil {
-		return nil, nil, err
-	}
-	fd, err := os.Open(path)
-	if err != nil {
-		return nil, nil, err
+		return true, nil, nil, err
 	}
 
-	return fd, info, nil
+	fd, err := os.Open(path)
+	if err != nil {
+		return true, nil, nil, err
+	}
+
+	if *oneFilesystem && rootDev != getDevice(info) {
+		fd.Close()
+		return false, nil, nil, fs.SkipDir
+	}
+
+	return true, fd, info, nil
+}
+
+func getDevice(info fs.FileInfo) uint64 {
+	return info.Sys().(*syscall.Stat_t).Dev
+}
+
+func getDeviceForPath(path string) uint64 {
+	fi, err := os.Stat(path)
+	if err != nil {
+		// Doesn't matter, because we'll get an error during WalkDir.
+		return 0
+	}
+	return getDevice(fi)
 }
 
 func generate(db DB, root string) error {
+	rootDev := getDeviceForPath(root)
 	p := NewProgress()
 	defer p.Stop()
-	fn := func(path string, d fs.DirEntry, err error) error {
-		if !isFileRelevant(path, d, err) {
-			return err
-		}
 
-		fd, info, err := openAndInfo(path, d)
-		if err != nil {
+	fn := func(path string, d fs.DirEntry, err error) error {
+		ok, fd, info, err := openAndInfo(path, d, err, rootDev)
+		if !ok || err != nil {
 			return err
 		}
 		defer fd.Close()
@@ -156,16 +172,13 @@ func generate(db DB, root string) error {
 }
 
 func verify(db DB, root string) error {
+	rootDev := getDeviceForPath(root)
 	p := NewProgress()
 	defer p.Stop()
 
 	fn := func(path string, d fs.DirEntry, err error) error {
-		if !isFileRelevant(path, d, err) {
-			return err
-		}
-
-		fd, info, err := openAndInfo(path, d)
-		if err != nil {
+		ok, fd, info, err := openAndInfo(path, d, err, rootDev)
+		if !ok || err != nil {
 			return err
 		}
 		defer fd.Close()
@@ -215,16 +228,13 @@ func verify(db DB, root string) error {
 }
 
 func update(db DB, root string) error {
+	rootDev := getDeviceForPath(root)
 	p := NewProgress()
 	defer p.Stop()
 
 	fn := func(path string, d fs.DirEntry, err error) error {
-		if !isFileRelevant(path, d, err) {
-			return err
-		}
-
-		fd, info, err := openAndInfo(path, d)
-		if err != nil {
+		ok, fd, info, err := openAndInfo(path, d, err, rootDev)
+		if !ok || err != nil {
 			return err
 		}
 		defer fd.Close()

@@ -30,6 +30,7 @@ No arguments.
       \tdatabase to read from/write to (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
+    -x\tdon't cross filesystem boundaries (esc)
   [1]
 
 
@@ -61,6 +62,7 @@ Too few arguments.
       \tdatabase to read from/write to (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
+    -x\tdon't cross filesystem boundaries (esc)
   [1]
 
 
@@ -92,6 +94,7 @@ No valid path (the argument is given, but it is empty).
       \tdatabase to read from/write to (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
+    -x\tdon't cross filesystem boundaries (esc)
   [1]
 
 

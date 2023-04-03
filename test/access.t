@@ -21,3 +21,12 @@ interfere.
   0s: 0 matched, 0 modified, 0 new, 0 corrupted
   open root/empty: permission denied
   [1]
+
+Test behaviour when the root does not exist. This exercises some different
+code paths, because the root is special.
+
+  $ summer verify doesnotexist
+  \r (no-eol) (esc)
+  0s: 0 matched, 0 modified, 0 new, 0 corrupted
+  lstat doesnotexist: no such file or directory
+  [1]
