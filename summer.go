@@ -118,7 +118,8 @@ func openAndInfo(path string, d fs.DirEntry) (*os.File, fs.FileInfo, error) {
 }
 
 func generate(db DB, root string) error {
-	var total int64
+	p := NewProgress()
+	defer p.Stop()
 	fn := func(path string, d fs.DirEntry, err error) error {
 		if !isFileRelevant(path, d, err) {
 			return err
@@ -146,17 +147,18 @@ func generate(db DB, root string) error {
 			return err
 		}
 
-		total++
+		p.PrintNew(path)
 		return nil
 	}
 
 	err := filepath.WalkDir(root, fn)
-	PrintWritten(total)
 	return err
 }
 
 func verify(db DB, root string) error {
-	var missing, modified, corrupted, matched int64
+	p := NewProgress()
+	defer p.Stop()
+
 	fn := func(path string, d fs.DirEntry, err error) error {
 		if !isFileRelevant(path, d, err) {
 			return err
@@ -173,8 +175,7 @@ func verify(db DB, root string) error {
 			return err
 		}
 		if !hasAttr {
-			PrintMissing(path)
-			missing++
+			p.PrintMissing(path)
 			return nil
 		}
 
@@ -195,30 +196,28 @@ func verify(db DB, root string) error {
 		}
 
 		if csumFromFile.ModTimeUsec != csumComputed.ModTimeUsec {
-			PrintModified(path)
-			modified++
+			p.PrintModified(path)
 		} else if csumFromFile.CRC32C != csumComputed.CRC32C {
-			PrintCorrupted(path, csumFromFile, csumComputed)
-			corrupted++
+			p.PrintCorrupted(path, csumFromFile, csumComputed)
 		} else {
-			PrintMatched(path)
-			matched++
+			p.PrintMatched(path)
 		}
 
 		return nil
 	}
 
 	err := filepath.WalkDir(root, fn)
-	PrintSummary(matched, modified, missing, corrupted)
 
-	if corrupted > 0 && err == nil {
-		err = fmt.Errorf("detected %d corrupted files", corrupted)
+	if p.corrupted > 0 && err == nil {
+		err = fmt.Errorf("detected %d corrupted files", p.corrupted)
 	}
 	return err
 }
 
 func update(db DB, root string) error {
-	var missing, modified, corrupted, matched int64
+	p := NewProgress()
+	defer p.Stop()
+
 	fn := func(path string, d fs.DirEntry, err error) error {
 		if !isFileRelevant(path, d, err) {
 			return err
@@ -249,8 +248,7 @@ func update(db DB, root string) error {
 		}
 		if !hasAttr {
 			// Attribute is missing. Expected for newly created files.
-			PrintMissing(path)
-			missing++
+			p.PrintMissing(path)
 			return db.Write(fd, csumComputed)
 		}
 
@@ -261,25 +259,21 @@ func update(db DB, root string) error {
 
 		if csumFromFile.ModTimeUsec != csumComputed.ModTimeUsec {
 			// File modified. Expected for updated files.
-			PrintModified(path)
-			modified++
+			p.PrintModified(path)
 			return db.Write(fd, csumComputed)
 		} else if csumFromFile.CRC32C != csumComputed.CRC32C {
-			PrintCorrupted(path, csumFromFile, csumComputed)
-			corrupted++
+			p.PrintCorrupted(path, csumFromFile, csumComputed)
 		} else {
-			PrintMatched(path)
-			matched++
+			p.PrintMatched(path)
 		}
 
 		return nil
 	}
 
 	err := filepath.WalkDir(root, fn)
-	PrintSummary(matched, modified, missing, corrupted)
 
-	if corrupted > 0 && err == nil {
-		err = fmt.Errorf("detected %d corrupted files", corrupted)
+	if p.corrupted > 0 && err == nil {
+		err = fmt.Errorf("detected %d corrupted files", p.corrupted)
 	}
 	return err
 }

@@ -7,11 +7,14 @@ This is enough to exercise the backend.
   $ echo marola > hola
 
   $ summer -db=db.sqlite3 generate .
-  3 checksums written
+  \r (no-eol) (esc)
+  0s: 0 matched, 0 modified, 3 new, 0 corrupted
   $ summer -db=db.sqlite3 verify .
-  2 matched, 1 modified, 0 new, 0 corrupted
+  \r (no-eol) (esc)
+  0s: 2 matched, 1 modified, 0 new, 0 corrupted
   $ summer -db=db.sqlite3 update .
-  2 matched, 1 modified, 0 new, 0 corrupted
+  \r (no-eol) (esc)
+  0s: 2 matched, 1 modified, 0 new, 0 corrupted
 
 Check that the root path doesn't confuse us.
 
@@ -19,12 +22,13 @@ Check that the root path doesn't confuse us.
   ".*/db.sqlite3": file modified \(not corrupted\), updating (re)
   ".*/empty": match (re)
   ".*/hola": match (re)
-  2 matched, 1 modified, 0 new, 0 corrupted
+  0s: 2 matched, 1 modified, 0 new, 0 corrupted
 
 Force a write error to check it is appropriately handled.
 
   $ summer "-db=file:db.sqlite3?mode=ro" generate .
-  . checksums written (re)
+  \r (no-eol) (esc)
+  0s: 0 matched, 0 modified, 0 new, 0 corrupted
   attempt to write a readonly database
   [1]
 

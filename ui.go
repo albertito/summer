@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"sync"
 	"time"
 )
 
@@ -30,32 +31,6 @@ func Fatalf(format string, args ...interface{}) {
 	os.Exit(1)
 }
 
-func PrintWritten(written int64) {
-	Printf("%d checksums written", written)
-}
-
-func PrintSummary(matched, modified, missing, corrupted int64) {
-	Printf("%d matched, %d modified, %d new, %d corrupted",
-		matched, modified, missing, corrupted)
-}
-
-func PrintCorrupted(path string, expected, got ChecksumV1) {
-	Printf("%q: FILE CORRUPTED - expected:%x, got:%x",
-		path, expected.CRC32C, got.CRC32C)
-}
-
-func PrintMissing(path string) {
-	Verbosef("%q: missing checksum attribute, adding it", path)
-}
-
-func PrintModified(path string) {
-	Verbosef("%q: file modified (not corrupted), updating", path)
-}
-
-func PrintMatched(path string) {
-	Verbosef("%q: match", path)
-}
-
 func PrintVersion() {
 	info, _ := debug.ReadBuildInfo()
 	rev := ""
@@ -69,4 +44,110 @@ func PrintVersion() {
 		}
 	}
 	Printf("summer version %s (%s)", rev, ts)
+}
+
+type Progress struct {
+	start time.Time
+
+	wg sync.WaitGroup
+	mu sync.Mutex
+
+	matched, modified, missing, corrupted int64
+
+	done chan bool
+}
+
+func NewProgress() *Progress {
+	p := &Progress{
+		start: time.Now(),
+		done:  make(chan bool),
+	}
+	p.wg.Add(1)
+	go p.periodicPrint()
+	return p
+}
+
+func (p *Progress) Stop() {
+	p.done <- true
+	p.wg.Wait()
+}
+
+func (p *Progress) periodicPrint() {
+	defer p.wg.Done()
+	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
+
+	if *quiet {
+		<-p.done
+		return
+	}
+
+	for {
+		select {
+		case <-p.done:
+			p.print()
+			if !*verbose {
+				fmt.Printf("\n")
+			}
+			return
+		case <-ticker.C:
+			p.print()
+		}
+	}
+}
+
+func (p *Progress) print() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// Usually we just overwrite the previous line.
+	// But when verbose, just print them.
+	prefix := "\r"
+	suffix := ""
+	if *verbose {
+		prefix = ""
+		suffix = "\n"
+	}
+
+	fmt.Printf(
+		prefix+"%v: %d matched, %d modified, %d new, %d corrupted"+suffix,
+		time.Since(p.start).Round(time.Second),
+		p.matched, p.modified, p.missing, p.corrupted,
+	)
+}
+
+func (p *Progress) PrintCorrupted(path string, expected, got ChecksumV1) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.corrupted++
+	Printf("%q: FILE CORRUPTED - expected:%x, got:%x",
+		path, expected.CRC32C, got.CRC32C)
+}
+
+func (p *Progress) PrintNew(path string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.missing++
+	Verbosef("%q: adding checksum", path)
+}
+
+func (p *Progress) PrintMissing(path string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.missing++
+	Verbosef("%q: missing checksum attribute, adding it", path)
+}
+
+func (p *Progress) PrintModified(path string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.modified++
+	Verbosef("%q: file modified (not corrupted), updating", path)
+}
+
+func (p *Progress) PrintMatched(path string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.matched++
+	Verbosef("%q: match", path)
 }

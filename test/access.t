@@ -9,12 +9,15 @@ interfere.
   $ echo marola > root/hola
 
   $ summer -db=db.sqlite3 generate root/
-  2 checksums written
+  \r (no-eol) (esc)
+  0s: 0 matched, 0 modified, 2 new, 0 corrupted
 
   $ summer -db=db.sqlite3 verify root/
-  2 matched, 0 modified, 0 new, 0 corrupted
+  \r (no-eol) (esc)
+  0s: 2 matched, 0 modified, 0 new, 0 corrupted
   $ chmod 0000 root/empty
   $ summer -db=db.sqlite3 verify root/
-  0 matched, 0 modified, 0 new, 0 corrupted
+  \r (no-eol) (esc)
+  0s: 0 matched, 0 modified, 0 new, 0 corrupted
   open root/empty: permission denied
   [1]
