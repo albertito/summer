@@ -26,9 +26,9 @@ Check that the root path doesn't confuse us.
 
 Force a write error to check it is appropriately handled.
 
-  $ summer "-db=file:db.sqlite3?mode=ro" generate .
+  $ summer "-db=file:db.sqlite3?mode=ro" update .
   \r (no-eol) (esc)
-  0s: 0 matched, 0 modified, 0 new, 0 corrupted
+  0s: 0 matched, 1 modified, 0 new, 0 corrupted
   attempt to write a readonly database
   [1]
 

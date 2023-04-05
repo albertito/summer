@@ -57,11 +57,12 @@ it.
   detected 1 corrupted files
   [1]
 
-But "generate" does override it.
+Editing the file makes us ignore the previous checksum.
 
-  $ summer generate .
+  $ touch hola
+  $ summer update .
   \r (no-eol) (esc)
-  0s: 0 matched, 0 modified, 3 new, 0 corrupted
+  0s: 2 matched, 1 modified, 0 new, 0 corrupted
   $ summer verify .
   \r (no-eol) (esc)
   0s: 3 matched, 0 modified, 0 new, 0 corrupted
@@ -77,10 +78,7 @@ Check verbose and quiet.
   0s: 3 matched, 0 modified, 1 new, 0 corrupted
   $ summer -v generate .
   "denuevo": writing checksum \(checksum:\w+, mtime:\d+\) (re)
-  "empty": writing checksum \(checksum:0, mtime:\d+\) (re)
-  "hola": writing checksum \(checksum:\w+, mtime:\d+\) (re)
-  "nueva": writing checksum \(checksum:\w+, mtime:\d+\) (re)
-  0s: 0 matched, 0 modified, 4 new, 0 corrupted
+  0s: 0 matched, 0 modified, 1 new, 0 corrupted
   $ summer -q verify .
   $ summer -q generate .
   $ summer -q update .

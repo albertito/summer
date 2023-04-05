@@ -14,14 +14,17 @@ No arguments.
   or to a separate database file (with the -db flag).
   
   Usage:
+  
     summer update <dir>
         Verify checksums in the given directory, and update them for new or
         changed files.
     summer verify <dir>
         Verify checksums in the given directory.
     summer generate <dir>
-        Write checksums for the given directory. Pre-existing checksums are
-        overwritten without verification.
+        Write checksums for the given directory. Files with pre-existing
+        checksums are left untouched, and checksums are not verified.
+        Useful when generating checksums for a lot of files for the first time,
+        as is faster to resume work if interrupted.
     summer version
         Print software version information.
   
@@ -47,14 +50,17 @@ Too few arguments.
   or to a separate database file (with the -db flag).
   
   Usage:
+  
     summer update <dir>
         Verify checksums in the given directory, and update them for new or
         changed files.
     summer verify <dir>
         Verify checksums in the given directory.
     summer generate <dir>
-        Write checksums for the given directory. Pre-existing checksums are
-        overwritten without verification.
+        Write checksums for the given directory. Files with pre-existing
+        checksums are left untouched, and checksums are not verified.
+        Useful when generating checksums for a lot of files for the first time,
+        as is faster to resume work if interrupted.
     summer version
         Print software version information.
   
@@ -80,14 +86,17 @@ No valid path (the argument is given, but it is empty).
   or to a separate database file (with the -db flag).
   
   Usage:
+  
     summer update <dir>
         Verify checksums in the given directory, and update them for new or
         changed files.
     summer verify <dir>
         Verify checksums in the given directory.
     summer generate <dir>
-        Write checksums for the given directory. Pre-existing checksums are
-        overwritten without verification.
+        Write checksums for the given directory. Files with pre-existing
+        checksums are left untouched, and checksums are not verified.
+        Useful when generating checksums for a lot of files for the first time,
+        as is faster to resume work if interrupted.
     summer version
         Print software version information.
   
