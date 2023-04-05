@@ -68,29 +68,38 @@ But "generate" does override it.
 
 Check verbose and quiet.
 
+  $ touch denuevo
   $ summer -v verify .
-  "empty": match
-  "hola": match
-  "nueva": match
-  0s: 3 matched, 0 modified, 0 new, 0 corrupted
+  "denuevo": missing checksum attribute
+  "empty": match \(checksum:0, mtime:\d+\) (re)
+  "hola": match \(checksum:\w+, mtime:\d+\) (re)
+  "nueva": match \(checksum:\w+, mtime:\d+\) (re)
+  0s: 3 matched, 0 modified, 1 new, 0 corrupted
+  $ summer -v generate .
+  "denuevo": writing checksum \(checksum:\w+, mtime:\d+\) (re)
+  "empty": writing checksum \(checksum:0, mtime:\d+\) (re)
+  "hola": writing checksum \(checksum:\w+, mtime:\d+\) (re)
+  "nueva": writing checksum \(checksum:\w+, mtime:\d+\) (re)
+  0s: 0 matched, 0 modified, 4 new, 0 corrupted
   $ summer -q verify .
   $ summer -q generate .
   $ summer -q update .
   $ summer -q verify .
+  $ rm denuevo
 
 Check that symlinks are ignored.
 
   $ ln -s hola thisisasymlink
   $ summer -v verify .
-  "empty": match
-  "hola": match
-  "nueva": match
+  "empty": match \(checksum:0, mtime:\d+\) (re)
+  "hola": match \(checksum:\w+, mtime:\d+\) (re)
+  "nueva": match \(checksum:\w+, mtime:\d+\) (re)
   0s: 3 matched, 0 modified, 0 new, 0 corrupted
 
 Check that the root path doesn't confuse us.
 
   $ summer -v verify $PWD
-  "/.*/empty": match (re)
-  "/.*/hola": match (re)
-  "/.*/nueva": match (re)
+  "/.*/empty": match \(checksum:0, mtime:\d+\) (re)
+  "/.*/hola": match \(checksum:\w+, mtime:\d+\) (re)
+  "/.*/nueva": match \(checksum:\w+, mtime:\d+\) (re)
   0s: 3 matched, 0 modified, 0 new, 0 corrupted

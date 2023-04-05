@@ -124,30 +124,40 @@ func (p *Progress) PrintCorrupted(path string, expected, got ChecksumV1) {
 		path, expected.CRC32C, got.CRC32C)
 }
 
-func (p *Progress) PrintNew(path string) {
+func (p *Progress) PrintNew(path string, cs ChecksumV1) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.missing++
-	Verbosef("%q: adding checksum", path)
+	Verbosef("%q: writing checksum (checksum:%x, mtime:%d)",
+		path, cs.CRC32C, cs.ModTimeUsec)
 }
 
-func (p *Progress) PrintMissing(path string) {
+func (p *Progress) PrintMissing(path string, cs *ChecksumV1) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.missing++
-	Verbosef("%q: missing checksum attribute, adding it", path)
+	if cs == nil {
+		Verbosef("%q: missing checksum attribute", path)
+	} else {
+		Verbosef("%q: missing checksum attribute, adding it "+
+			"(checksum:%x, mtime:%d)",
+			path, cs.CRC32C, cs.ModTimeUsec)
+	}
 }
 
-func (p *Progress) PrintModified(path string) {
+func (p *Progress) PrintModified(path string, old, new_ ChecksumV1) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.modified++
-	Verbosef("%q: file modified (not corrupted), updating", path)
+	Verbosef("%q: file modified (not corrupted) "+
+		"(checksum: %x -> %x, mtime: %d -> %d)",
+		path, old.CRC32C, new_.CRC32C, old.ModTimeUsec, new_.ModTimeUsec)
 }
 
-func (p *Progress) PrintMatched(path string) {
+func (p *Progress) PrintMatched(path string, cs ChecksumV1) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.matched++
-	Verbosef("%q: match", path)
+	Verbosef("%q: match (checksum:%x, mtime:%d)",
+		path, cs.CRC32C, cs.ModTimeUsec)
 }

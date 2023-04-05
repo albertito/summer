@@ -19,9 +19,9 @@ This is enough to exercise the backend.
 Check that the root path doesn't confuse us.
 
   $ summer -db=db.sqlite3 -v verify $PWD
-  ".*/db.sqlite3": file modified \(not corrupted\), updating (re)
-  ".*/empty": match (re)
-  ".*/hola": match (re)
+  ".*/db.sqlite3": file modified \(not corrupted\) \(checksum: \w+ -> \w+, mtime: \d+ -> \d+\) (re)
+  ".*/empty": match \(checksum:0, mtime:\d+\) (re)
+  ".*/hola": match \(checksum:\w+, mtime:\d+\) (re)
   0s: 2 matched, 1 modified, 0 new, 0 corrupted
 
 Force a write error to check it is appropriately handled.

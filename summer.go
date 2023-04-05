@@ -163,7 +163,7 @@ func generate(db DB, root string) error {
 			return err
 		}
 
-		p.PrintNew(path)
+		p.PrintNew(path, csum)
 		return nil
 	}
 
@@ -188,7 +188,7 @@ func verify(db DB, root string) error {
 			return err
 		}
 		if !hasAttr {
-			p.PrintMissing(path)
+			p.PrintMissing(path, nil)
 			return nil
 		}
 
@@ -209,11 +209,11 @@ func verify(db DB, root string) error {
 		}
 
 		if csumFromFile.ModTimeUsec != csumComputed.ModTimeUsec {
-			p.PrintModified(path)
+			p.PrintModified(path, csumFromFile, csumComputed)
 		} else if csumFromFile.CRC32C != csumComputed.CRC32C {
 			p.PrintCorrupted(path, csumFromFile, csumComputed)
 		} else {
-			p.PrintMatched(path)
+			p.PrintMatched(path, csumComputed)
 		}
 
 		return nil
@@ -258,7 +258,7 @@ func update(db DB, root string) error {
 		}
 		if !hasAttr {
 			// Attribute is missing. Expected for newly created files.
-			p.PrintMissing(path)
+			p.PrintMissing(path, &csumComputed)
 			return db.Write(fd, csumComputed)
 		}
 
@@ -269,12 +269,12 @@ func update(db DB, root string) error {
 
 		if csumFromFile.ModTimeUsec != csumComputed.ModTimeUsec {
 			// File modified. Expected for updated files.
-			p.PrintModified(path)
+			p.PrintModified(path, csumFromFile, csumComputed)
 			return db.Write(fd, csumComputed)
 		} else if csumFromFile.CRC32C != csumComputed.CRC32C {
 			p.PrintCorrupted(path, csumFromFile, csumComputed)
 		} else {
-			p.PrintMatched(path)
+			p.PrintMatched(path, csumComputed)
 		}
 
 		return nil
