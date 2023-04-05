@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/binary"
+	"flag"
 	"os"
 	"path/filepath"
 
@@ -11,6 +12,9 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+var dryRun = flag.Bool("n", false,
+	"dry-run mode (do not write anything)")
 
 type DB interface {
 	Has(f *os.File) (bool, error)
@@ -44,6 +48,10 @@ func (_ XattrDB) Read(f *os.File) (ChecksumV1, error) {
 }
 
 func (_ XattrDB) Write(f *os.File, cs ChecksumV1) error {
+	if *dryRun {
+		return nil
+	}
+
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.LittleEndian, cs)
 	if err != nil {
@@ -110,6 +118,10 @@ func (s *SqliteDB) Read(f *os.File) (ChecksumV1, error) {
 }
 
 func (s *SqliteDB) Write(f *os.File, cs ChecksumV1) error {
+	if *dryRun {
+		return nil
+	}
+
 	path, err := filepath.Rel(s.root, f.Name())
 	if err != nil {
 		return err

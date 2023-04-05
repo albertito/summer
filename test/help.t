@@ -28,6 +28,7 @@ No arguments.
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -n\tdry-run mode (do not write anything) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
     -x\tdon't cross filesystem boundaries (esc)
@@ -60,6 +61,7 @@ Too few arguments.
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -n\tdry-run mode (do not write anything) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
     -x\tdon't cross filesystem boundaries (esc)
@@ -92,6 +94,7 @@ No valid path (the argument is given, but it is empty).
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -n\tdry-run mode (do not write anything) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
     -x\tdon't cross filesystem boundaries (esc)
