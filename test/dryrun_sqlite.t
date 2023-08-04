@@ -10,21 +10,17 @@ Generate test data.
 Generate and verify.
 
   $ summer -n -db=db.sqlite3 generate .
-  \r (no-eol) (esc)
   0s: 0 matched, 0 modified, 3 new, 0 corrupted
 
   $ summer -n -db=db.sqlite3 verify .
-  \r (no-eol) (esc)
   0s: 0 matched, 0 modified, 3 new, 0 corrupted
 
   $ summer -n -db=db.sqlite3 verify .
-  \r (no-eol) (esc)
   0s: 0 matched, 0 modified, 3 new, 0 corrupted
 
 Now write data for real, so we can test modification.
 
   $ summer -db=db.sqlite3 generate .
-  \r (no-eol) (esc)
   0s: 0 matched, 0 modified, 3 new, 0 corrupted
 
 Check handling of new and updated files.
@@ -32,11 +28,8 @@ Check handling of new and updated files.
   $ echo trova > nueva
   $ touch empty
   $ summer -n -db=db.sqlite3 verify .
-  \r (no-eol) (esc)
   0s: 1 matched, 2 modified, 1 new, 0 corrupted
   $ summer -n -db=db.sqlite3 update .
-  \r (no-eol) (esc)
   0s: 1 matched, 2 modified, 1 new, 0 corrupted
   $ summer -n -db=db.sqlite3 verify .
-  \r (no-eol) (esc)
   0s: 1 matched, 2 modified, 1 new, 0 corrupted

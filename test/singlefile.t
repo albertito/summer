@@ -14,7 +14,6 @@ Test that summer works fine when given a file instead of a directory.
   0s: 1 matched, 0 modified, 1 new, 0 corrupted
 
   $ summer update ./hola
-  \r (no-eol) (esc)
   0s: 0 matched, 0 modified, 1 new, 0 corrupted
 
   $ summer -v verify .

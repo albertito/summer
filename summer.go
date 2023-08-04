@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+
+	"golang.org/x/term"
 )
 
 const usage = `# summer 🌞 🏖
@@ -40,6 +42,7 @@ Flags:
 var (
 	dbPath        = flag.String("db", "", "database to read from/write to")
 	oneFilesystem = flag.Bool("x", false, "don't cross filesystem boundaries")
+	forceTTY      = flag.Bool("forcetty", false, "force TTY output")
 )
 
 var options = struct {
@@ -48,6 +51,9 @@ var options = struct {
 
 	// Do not cross filesystem boundaries.
 	oneFilesystem bool
+
+	// Whether output is a TTY.
+	isTTY bool
 }{}
 
 func Usage() {
@@ -62,6 +68,7 @@ func main() {
 	flag.Parse()
 
 	options.oneFilesystem = *oneFilesystem
+	options.isTTY = *forceTTY || term.IsTerminal(int(os.Stdout.Fd()))
 
 	op := flag.Arg(0)
 	root := flag.Arg(1)
@@ -150,7 +157,7 @@ func getDeviceForPath(path string) uint64 {
 
 func generate(root string) error {
 	rootDev := getDeviceForPath(root)
-	p := NewProgress()
+	p := NewProgress(options.isTTY)
 	defer p.Stop()
 
 	fn := func(path string, d fs.DirEntry, err error) error {
@@ -195,7 +202,7 @@ func generate(root string) error {
 
 func verify(root string) error {
 	rootDev := getDeviceForPath(root)
-	p := NewProgress()
+	p := NewProgress(options.isTTY)
 	defer p.Stop()
 
 	fn := func(path string, d fs.DirEntry, err error) error {
@@ -251,7 +258,7 @@ func verify(root string) error {
 
 func update(root string) error {
 	rootDev := getDeviceForPath(root)
-	p := NewProgress()
+	p := NewProgress(options.isTTY)
 	defer p.Stop()
 
 	fn := func(path string, d fs.DirEntry, err error) error {

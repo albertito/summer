@@ -31,6 +31,8 @@ No arguments.
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -forcetty
+      \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
@@ -67,6 +69,8 @@ Too few arguments.
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -forcetty
+      \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
@@ -103,6 +107,8 @@ No valid path (the argument is given, but it is empty).
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -forcetty
+      \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)

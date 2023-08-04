@@ -10,11 +10,9 @@ Generate test data.
 Generate and verify.
 
   $ summer generate .
-  \r (no-eol) (esc)
   0s: 0 matched, 0 modified, 2 new, 0 corrupted
 
   $ summer verify .
-  \r (no-eol) (esc)
   0s: 2 matched, 0 modified, 0 new, 0 corrupted
 
 Check handling of new and updated files.
@@ -22,13 +20,10 @@ Check handling of new and updated files.
   $ echo trova > nueva
   $ touch empty
   $ summer verify .
-  \r (no-eol) (esc)
   0s: 1 matched, 1 modified, 1 new, 0 corrupted
   $ summer update .
-  \r (no-eol) (esc)
   0s: 1 matched, 1 modified, 1 new, 0 corrupted
   $ summer verify .
-  \r (no-eol) (esc)
   0s: 3 matched, 0 modified, 0 new, 0 corrupted
 
 Corrupt a file by changing its contents without changing the mtime.
@@ -36,13 +31,11 @@ Corrupt a file by changing its contents without changing the mtime.
   $ OLD_MTIME=`stat -c "%y" hola`
   $ echo sospechoso >> hola
   $ summer verify .
-  \r (no-eol) (esc)
   0s: 2 matched, 1 modified, 0 new, 0 corrupted
   $ touch --date="$OLD_MTIME" hola
 
   $ summer verify .
   "hola": FILE CORRUPTED - expected:239059f6, got:916db13f
-  \r (no-eol) (esc)
   0s: 2 matched, 0 modified, 0 new, 1 corrupted
   detected 1 corrupted files
   [1]
@@ -52,7 +45,6 @@ it.
 
   $ summer update .
   "hola": FILE CORRUPTED - expected:239059f6, got:916db13f
-  \r (no-eol) (esc)
   0s: 2 matched, 0 modified, 0 new, 1 corrupted
   detected 1 corrupted files
   [1]
@@ -61,10 +53,8 @@ Editing the file makes us ignore the previous checksum.
 
   $ touch hola
   $ summer update .
-  \r (no-eol) (esc)
   0s: 2 matched, 1 modified, 0 new, 0 corrupted
   $ summer verify .
-  \r (no-eol) (esc)
   0s: 3 matched, 0 modified, 0 new, 0 corrupted
 
 Check verbose and quiet.

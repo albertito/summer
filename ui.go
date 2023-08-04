@@ -48,6 +48,7 @@ func PrintVersion() {
 
 type Progress struct {
 	start time.Time
+	isTTY bool
 
 	wg sync.WaitGroup
 	mu sync.Mutex
@@ -57,10 +58,11 @@ type Progress struct {
 	done chan bool
 }
 
-func NewProgress() *Progress {
+func NewProgress(isTTY bool) *Progress {
 	p := &Progress{
 		start: time.Now(),
 		done:  make(chan bool),
+		isTTY: isTTY,
 	}
 	p.wg.Add(1)
 	go p.periodicPrint()
@@ -85,26 +87,30 @@ func (p *Progress) periodicPrint() {
 	for {
 		select {
 		case <-p.done:
-			p.print()
-			if !*verbose {
-				fmt.Printf("\n")
-			}
+			p.print(true)
 			return
 		case <-ticker.C:
-			p.print()
+			if p.isTTY {
+				p.print(false)
+			}
 		}
 	}
 }
 
-func (p *Progress) print() {
+func (p *Progress) print(last bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	// Usually we just overwrite the previous line.
-	// But when verbose, just print them.
 	prefix := "\r"
 	suffix := ""
-	if *verbose {
+	if last {
+		suffix = "\n"
+	}
+
+	// Usually we just overwrite the previous line.
+	// But when verbose, just print one after the other.
+	// For non-TTY, never overwrite.
+	if *verbose || !p.isTTY {
 		prefix = ""
 		suffix = "\n"
 	}
