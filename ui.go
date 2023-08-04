@@ -167,3 +167,14 @@ func (p *Progress) PrintMatched(path string, cs ChecksumV1) {
 	Verbosef("%q: match (checksum:%x, mtime:%d)",
 		path, cs.CRC32C, cs.ModTimeUsec)
 }
+
+type RepeatedStringFlag []string
+
+func (f *RepeatedStringFlag) String() string {
+	return fmt.Sprintf("%v", *f)
+}
+
+func (f *RepeatedStringFlag) Set(value string) error {
+	*f = append(*f, value)
+	return nil
+}

@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"syscall"
 
 	"golang.org/x/term"
@@ -39,10 +40,13 @@ Usage:
 Flags:
 `
 
+// Flags.
 var (
 	dbPath        = flag.String("db", "", "database to read from/write to")
 	oneFilesystem = flag.Bool("x", false, "don't cross filesystem boundaries")
 	forceTTY      = flag.Bool("forcetty", false, "force TTY output")
+	exclude       = &RepeatedStringFlag{}
+	excludeRe     = &RepeatedStringFlag{}
 )
 
 var options = struct {
@@ -54,6 +58,12 @@ var options = struct {
 
 	// Whether output is a TTY.
 	isTTY bool
+
+	// Paths to exclude.
+	exclude map[string]bool
+
+	// Regexp patterns to exclude.
+	excludeRe []*regexp.Regexp
 }{}
 
 func Usage() {
@@ -64,11 +74,25 @@ func Usage() {
 func main() {
 	var err error
 
+	flag.Var(exclude, "exclude",
+		"exclude these paths (can be repeated)")
+	flag.Var(excludeRe, "excludere",
+		"exclude paths matching this regexp (can be repeated)")
+
 	flag.Usage = Usage
 	flag.Parse()
 
 	options.oneFilesystem = *oneFilesystem
 	options.isTTY = *forceTTY || term.IsTerminal(int(os.Stdout.Fd()))
+
+	options.exclude = map[string]bool{}
+	for _, s := range *exclude {
+		options.exclude[filepath.Clean(s)] = true
+	}
+
+	for _, s := range *excludeRe {
+		options.excludeRe = append(options.excludeRe, regexp.MustCompile(s))
+	}
 
 	op := flag.Arg(0)
 	root := flag.Arg(1)
@@ -105,6 +129,18 @@ func main() {
 	}
 }
 
+func isExcluded(path string) bool {
+	if options.exclude[path] {
+		return true
+	}
+	for _, re := range options.excludeRe {
+		if re.MatchString(path) {
+			return true
+		}
+	}
+	return false
+}
+
 var crc32c = crc32.MakeTable(crc32.Castagnoli)
 
 type ChecksumV1 struct {
@@ -117,13 +153,21 @@ type ChecksumV1 struct {
 }
 
 func openAndInfo(path string, d fs.DirEntry, err error, rootDev uint64) (bool, *os.File, fs.FileInfo, error) {
+	// Excluded check must come first, because it can be use to skip
+	// directories that would otherwise cause errors.
+	if isExcluded(path) {
+		if d.IsDir() {
+			return false, nil, nil, fs.SkipDir
+		}
+		return false, nil, nil, nil
+	}
+
 	if err != nil {
 		return false, nil, nil, err
 	}
 	if d.IsDir() || !d.Type().IsRegular() {
 		return false, nil, nil, nil
 	}
-
 	info, err := d.Info()
 	if err != nil {
 		return true, nil, nil, err

@@ -31,6 +31,10 @@ No arguments.
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -exclude value
+      \texclude these paths (can be repeated) (esc)
+    -excludere value
+      \texclude paths matching this regexp (can be repeated) (esc)
     -forcetty
       \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
@@ -69,6 +73,10 @@ Too few arguments.
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -exclude value
+      \texclude these paths (can be repeated) (esc)
+    -excludere value
+      \texclude paths matching this regexp (can be repeated) (esc)
     -forcetty
       \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
@@ -107,6 +115,10 @@ No valid path (the argument is given, but it is empty).
   Flags:
     -db string
       \tdatabase to read from/write to (esc)
+    -exclude value
+      \texclude these paths (can be repeated) (esc)
+    -excludere value
+      \texclude paths matching this regexp (can be repeated) (esc)
     -forcetty
       \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
