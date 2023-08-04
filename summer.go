@@ -42,6 +42,14 @@ var (
 	oneFilesystem = flag.Bool("x", false, "don't cross filesystem boundaries")
 )
 
+var options = struct {
+	// Database to use.
+	db DB
+
+	// Do not cross filesystem boundaries.
+	oneFilesystem bool
+}{}
+
 func Usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), usage)
 	flag.PrintDefaults()
@@ -53,6 +61,8 @@ func main() {
 	flag.Usage = Usage
 	flag.Parse()
 
+	options.oneFilesystem = *oneFilesystem
+
 	op := flag.Arg(0)
 	root := flag.Arg(1)
 
@@ -61,22 +71,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	var db DB = XattrDB{}
+	options.db = XattrDB{}
 	if *dbPath != "" {
-		db, err = OpenSqliteDB(*dbPath, root)
+		options.db, err = OpenSqliteDB(*dbPath, root)
 		if err != nil {
 			Fatalf("%q: %v", *dbPath, err)
 		}
 	}
-	defer db.Close()
+	defer options.db.Close()
 
 	switch op {
 	case "generate":
-		err = generate(db, root)
+		err = generate(root)
 	case "verify":
-		err = verify(db, root)
+		err = verify(root)
 	case "update":
-		err = update(db, root)
+		err = update(root)
 	case "version":
 		PrintVersion()
 	default:
@@ -117,7 +127,7 @@ func openAndInfo(path string, d fs.DirEntry, err error, rootDev uint64) (bool, *
 		return true, nil, nil, err
 	}
 
-	if *oneFilesystem && rootDev != getDevice(info) {
+	if options.oneFilesystem && rootDev != getDevice(info) {
 		fd.Close()
 		return false, nil, nil, fs.SkipDir
 	}
@@ -138,7 +148,7 @@ func getDeviceForPath(path string) uint64 {
 	return getDevice(fi)
 }
 
-func generate(db DB, root string) error {
+func generate(root string) error {
 	rootDev := getDeviceForPath(root)
 	p := NewProgress()
 	defer p.Stop()
@@ -150,7 +160,7 @@ func generate(db DB, root string) error {
 		}
 		defer fd.Close()
 
-		hasAttr, err := db.Has(fd)
+		hasAttr, err := options.db.Has(fd)
 		if err != nil {
 			return err
 		}
@@ -170,7 +180,7 @@ func generate(db DB, root string) error {
 			ModTimeUsec: info.ModTime().UnixMicro(),
 		}
 
-		err = db.Write(fd, csum)
+		err = options.db.Write(fd, csum)
 		if err != nil {
 			return err
 		}
@@ -183,7 +193,7 @@ func generate(db DB, root string) error {
 	return err
 }
 
-func verify(db DB, root string) error {
+func verify(root string) error {
 	rootDev := getDeviceForPath(root)
 	p := NewProgress()
 	defer p.Stop()
@@ -195,7 +205,7 @@ func verify(db DB, root string) error {
 		}
 		defer fd.Close()
 
-		hasAttr, err := db.Has(fd)
+		hasAttr, err := options.db.Has(fd)
 		if err != nil {
 			return err
 		}
@@ -204,7 +214,7 @@ func verify(db DB, root string) error {
 			return nil
 		}
 
-		csumFromFile, err := db.Read(fd)
+		csumFromFile, err := options.db.Read(fd)
 		if err != nil {
 			return err
 		}
@@ -239,7 +249,7 @@ func verify(db DB, root string) error {
 	return err
 }
 
-func update(db DB, root string) error {
+func update(root string) error {
 	rootDev := getDeviceForPath(root)
 	p := NewProgress()
 	defer p.Stop()
@@ -264,17 +274,17 @@ func update(db DB, root string) error {
 		}
 
 		// Read the saved checksum (if any).
-		hasAttr, err := db.Has(fd)
+		hasAttr, err := options.db.Has(fd)
 		if err != nil {
 			return err
 		}
 		if !hasAttr {
 			// Attribute is missing. Expected for newly created files.
 			p.PrintMissing(path, &csumComputed)
-			return db.Write(fd, csumComputed)
+			return options.db.Write(fd, csumComputed)
 		}
 
-		csumFromFile, err := db.Read(fd)
+		csumFromFile, err := options.db.Read(fd)
 		if err != nil {
 			return err
 		}
@@ -282,7 +292,7 @@ func update(db DB, root string) error {
 		if csumFromFile.ModTimeUsec != csumComputed.ModTimeUsec {
 			// File modified. Expected for updated files.
 			p.PrintModified(path, csumFromFile, csumComputed)
-			return db.Write(fd, csumComputed)
+			return options.db.Write(fd, csumComputed)
 		} else if csumFromFile.CRC32C != csumComputed.CRC32C {
 			p.PrintCorrupted(path, csumFromFile, csumComputed)
 		} else {
