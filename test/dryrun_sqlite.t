@@ -25,6 +25,7 @@ Now write data for real, so we can test modification.
 
 Check handling of new and updated files.
 
+  $ sleep 0.005
   $ echo trova > nueva
   $ touch empty
   $ summer -n -db=db.sqlite3 verify .

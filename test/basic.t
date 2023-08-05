@@ -17,6 +17,7 @@ Generate and verify.
 
 Check handling of new and updated files.
 
+  $ sleep 0.005
   $ echo trova > nueva
   $ touch empty
   $ summer verify .
