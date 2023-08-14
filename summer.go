@@ -149,6 +149,18 @@ type ChecksumV1 struct {
 
 	// Modification time of the file when the checksum was computed.
 	// In Unix microseconds.
+	//
+	// Because we do not lock the file, it could be modified as we read it,
+	// and then depending on the order of operations, the checksum could be
+	// wrong and cause a false positive.
+	// To avoid this, we always read the modification time prior to reading
+	// the file contents. That way, if the file changes while we are reading
+	// it, it should be detected later as modified instead of corrupted.
+	//
+	// This relies on mtime having enough resolution to detect the change. On
+	// some filesystems that may not be the case, and a file modified very
+	// quickly may not be detected as modified. This is a limitation of the
+	// filesystem, and there is nothing we can do about it.
 	ModTimeUsec int64
 }
 
@@ -168,6 +180,11 @@ func openAndInfo(path string, d fs.DirEntry, err error, rootDev uint64) (bool, *
 	if d.IsDir() || !d.Type().IsRegular() {
 		return false, nil, nil, nil
 	}
+
+	// It is important that we obtain fs.FileInfo at this point, before
+	// reading any of the file contents, because the file could be modified
+	// while we do so. See the comment on ChecksumV1.ModTimeUsec for more
+	// details.
 	info, err := d.Info()
 	if err != nil {
 		return true, nil, nil, err
