@@ -14,17 +14,17 @@ No arguments.
   
   Usage:
   
-    summer update <dir>
+    summer [flags] update <dir>
         Verify checksums in the given directory, and update them for new or
         changed files.
-    summer verify <dir>
+    summer [flags] verify <dir>
         Verify checksums in the given directory.
-    summer generate <dir>
+    summer [flags] generate <dir>
         Write checksums for the given directory. Files with pre-existing
         checksums are left untouched, and checksums are not verified.
         Useful when generating checksums for a lot of files for the first time,
         as is faster to resume work if interrupted.
-    summer version
+    summer [flags] version
         Print software version information.
   
   Flags:
@@ -53,17 +53,17 @@ Too few arguments.
   
   Usage:
   
-    summer update <dir>
+    summer [flags] update <dir>
         Verify checksums in the given directory, and update them for new or
         changed files.
-    summer verify <dir>
+    summer [flags] verify <dir>
         Verify checksums in the given directory.
-    summer generate <dir>
+    summer [flags] generate <dir>
         Write checksums for the given directory. Files with pre-existing
         checksums are left untouched, and checksums are not verified.
         Useful when generating checksums for a lot of files for the first time,
         as is faster to resume work if interrupted.
-    summer version
+    summer [flags] version
         Print software version information.
   
   Flags:
@@ -92,17 +92,17 @@ No valid path (the argument is given, but it is empty).
   
   Usage:
   
-    summer update <dir>
+    summer [flags] update <dir>
         Verify checksums in the given directory, and update them for new or
         changed files.
-    summer verify <dir>
+    summer [flags] verify <dir>
         Verify checksums in the given directory.
-    summer generate <dir>
+    summer [flags] generate <dir>
         Write checksums for the given directory. Files with pre-existing
         checksums are left untouched, and checksums are not verified.
         Useful when generating checksums for a lot of files for the first time,
         as is faster to resume work if interrupted.
-    summer version
+    summer [flags] version
         Print software version information.
   
   Flags:
