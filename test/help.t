@@ -10,8 +10,7 @@ No arguments.
   Utility to detect accidental data corruption (e.g. bitrot, storage media
   problems).  Not intended to detect malicious modification.
   
-  Checksums are written to/read from each files' extended attributes by default,
-  or to a separate database file (with the -db flag).
+  Checksums are written to/read from each file's extended attributes.
   
   Usage:
   
@@ -29,8 +28,6 @@ No arguments.
         Print software version information.
   
   Flags:
-    -db string
-      \tdatabase to read from/write to (esc)
     -exclude value
       \texclude these paths (can be repeated) (esc)
     -excludere value
@@ -52,8 +49,7 @@ Too few arguments.
   Utility to detect accidental data corruption (e.g. bitrot, storage media
   problems).  Not intended to detect malicious modification.
   
-  Checksums are written to/read from each files' extended attributes by default,
-  or to a separate database file (with the -db flag).
+  Checksums are written to/read from each file's extended attributes.
   
   Usage:
   
@@ -71,8 +67,6 @@ Too few arguments.
         Print software version information.
   
   Flags:
-    -db string
-      \tdatabase to read from/write to (esc)
     -exclude value
       \texclude these paths (can be repeated) (esc)
     -excludere value
@@ -94,8 +88,7 @@ No valid path (the argument is given, but it is empty).
   Utility to detect accidental data corruption (e.g. bitrot, storage media
   problems).  Not intended to detect malicious modification.
   
-  Checksums are written to/read from each files' extended attributes by default,
-  or to a separate database file (with the -db flag).
+  Checksums are written to/read from each file's extended attributes.
   
   Usage:
   
@@ -113,8 +106,6 @@ No valid path (the argument is given, but it is empty).
         Print software version information.
   
   Flags:
-    -db string
-      \tdatabase to read from/write to (esc)
     -exclude value
       \texclude these paths (can be repeated) (esc)
     -excludere value

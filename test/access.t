@@ -8,13 +8,13 @@ interfere.
   $ touch root/empty
   $ echo marola > root/hola
 
-  $ summer -db=db.sqlite3 generate root/
+  $ summer generate root/
   0s: 0 matched, 0 modified, 2 new, 0 corrupted
 
-  $ summer -db=db.sqlite3 verify root/
+  $ summer verify root/
   0s: 2 matched, 0 modified, 0 new, 0 corrupted
   $ chmod 0000 root/empty
-  $ summer -db=db.sqlite3 verify root/
+  $ summer verify root/
   0s: 0 matched, 0 modified, 0 new, 0 corrupted
   open root/empty: permission denied
   [1]

@@ -19,8 +19,7 @@ const usage = `# summer 🌞 🏖
 Utility to detect accidental data corruption (e.g. bitrot, storage media
 problems).  Not intended to detect malicious modification.
 
-Checksums are written to/read from each files' extended attributes by default,
-or to a separate database file (with the -db flag).
+Checksums are written to/read from each file's extended attributes.
 
 Usage:
 
@@ -42,7 +41,6 @@ Flags:
 
 // Flags.
 var (
-	dbPath        = flag.String("db", "", "database to read from/write to")
 	oneFilesystem = flag.Bool("x", false, "don't cross filesystem boundaries")
 	forceTTY      = flag.Bool("forcetty", false, "force TTY output")
 	exclude       = &RepeatedStringFlag{}
@@ -103,12 +101,6 @@ func main() {
 	}
 
 	options.db = XattrDB{}
-	if *dbPath != "" {
-		options.db, err = OpenSqliteDB(*dbPath, root)
-		if err != nil {
-			Fatalf("%q: %v", *dbPath, err)
-		}
-	}
 	defer options.db.Close()
 
 	switch op {
