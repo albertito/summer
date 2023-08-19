@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-cd $(realpath "$(dirname "$0")" )
+cd "$(realpath "$(dirname "$0")" )"
 
 export GOCOVERDIR="$PWD/.cover/"
 rm -rf "${GOCOVERDIR?}"
