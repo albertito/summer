@@ -33,7 +33,7 @@ func Fatalf(format string, args ...interface{}) {
 
 func PrintVersion() {
 	info, _ := debug.ReadBuildInfo()
-	rev := ""
+	rev := info.Main.Version
 	ts := time.Time{}
 	for _, s := range info.Settings {
 		switch s.Key {
