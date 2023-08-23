@@ -21,16 +21,19 @@ problems).  Not intended to detect malicious modification.
 
 Checksums are written to/read from each file's extended attributes.
 
+Paths given can be files or directories. If a directory is given, it is
+processed recursively.
+
 Usage:
 
-  summer [flags] update <dir>
-      Verify checksums in the given directory, and update them for new or
-      changed files.
-  summer [flags] verify <dir>
-      Verify checksums in the given directory.
-  summer [flags] generate <dir>
-      Write checksums for the given directory. Files with pre-existing
-      checksums are left untouched, and checksums are not verified.
+  summer [flags] update <paths>
+      Verify checksums in the given paths, and update them for new or changed
+      files.
+  summer [flags] verify <paths>
+      Verify checksums in the given paths.
+  summer [flags] generate <paths>
+      Write checksums for the given paths. Files with pre-existing checksums
+      are left untouched, and checksums are not verified.
       Useful when generating checksums for a lot of files for the first time,
       as is faster to resume work if interrupted.
   summer [flags] version
@@ -93,9 +96,12 @@ func main() {
 	}
 
 	op := flag.Arg(0)
-	root := flag.Arg(1)
+	roots := []string{}
+	if flag.NArg() > 1 {
+		roots = flag.Args()[1:]
+	}
 
-	if op != "version" && root == "" {
+	if op != "version" && len(roots) == 0 {
 		Usage()
 		os.Exit(1)
 	}
@@ -105,11 +111,11 @@ func main() {
 
 	switch op {
 	case "generate":
-		err = generate(root)
+		err = generate(roots)
 	case "verify":
-		err = verify(root)
+		err = verify(roots)
 	case "update":
-		err = update(root)
+		err = update(roots)
 	case "version":
 		PrintVersion()
 	default:
@@ -156,7 +162,7 @@ type ChecksumV1 struct {
 	ModTimeUsec int64
 }
 
-func openAndInfo(path string, d fs.DirEntry, err error, rootDev uint64) (bool, *os.File, fs.FileInfo, error) {
+func openAndInfo(path string, d fs.DirEntry, err error, rootDev deviceID) (bool, *os.File, fs.FileInfo, error) {
 	// Excluded check must come first, because it can be use to skip
 	// directories that would otherwise cause errors.
 	if isExcluded(path) {
@@ -195,11 +201,13 @@ func openAndInfo(path string, d fs.DirEntry, err error, rootDev uint64) (bool, *
 	return true, fd, info, nil
 }
 
-func getDevice(info fs.FileInfo) uint64 {
-	return info.Sys().(*syscall.Stat_t).Dev
+type deviceID uint64
+
+func getDevice(info fs.FileInfo) deviceID {
+	return deviceID(info.Sys().(*syscall.Stat_t).Dev)
 }
 
-func getDeviceForPath(path string) uint64 {
+func getDeviceForPath(path string) deviceID {
 	fi, err := os.Stat(path)
 	if err != nil {
 		// Doesn't matter, because we'll get an error during WalkDir.
@@ -208,8 +216,8 @@ func getDeviceForPath(path string) uint64 {
 	return getDevice(fi)
 }
 
-func generate(root string) error {
-	rootDev := getDeviceForPath(root)
+func generate(roots []string) error {
+	rootDev := deviceID(0)
 	p := NewProgress(options.isTTY)
 	defer p.Stop()
 
@@ -249,12 +257,18 @@ func generate(root string) error {
 		return nil
 	}
 
-	err := filepath.WalkDir(root, fn)
-	return err
+	for _, root := range roots {
+		rootDev = getDeviceForPath(root)
+		err := filepath.WalkDir(root, fn)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func verify(root string) error {
-	rootDev := getDeviceForPath(root)
+func verify(roots []string) error {
+	rootDev := deviceID(0)
 	p := NewProgress(options.isTTY)
 	defer p.Stop()
 
@@ -301,7 +315,14 @@ func verify(root string) error {
 		return nil
 	}
 
-	err := filepath.WalkDir(root, fn)
+	var err error
+	for _, root := range roots {
+		rootDev = getDeviceForPath(root)
+		err = filepath.WalkDir(root, fn)
+		if err != nil {
+			break
+		}
+	}
 
 	if p.corrupted > 0 && err == nil {
 		err = fmt.Errorf("detected %d corrupted files", p.corrupted)
@@ -309,8 +330,8 @@ func verify(root string) error {
 	return err
 }
 
-func update(root string) error {
-	rootDev := getDeviceForPath(root)
+func update(roots []string) error {
+	rootDev := deviceID(0)
 	p := NewProgress(options.isTTY)
 	defer p.Stop()
 
@@ -362,7 +383,14 @@ func update(root string) error {
 		return nil
 	}
 
-	err := filepath.WalkDir(root, fn)
+	var err error
+	for _, root := range roots {
+		rootDev = getDeviceForPath(root)
+		err = filepath.WalkDir(root, fn)
+		if err != nil {
+			break
+		}
+	}
 
 	if p.corrupted > 0 && err == nil {
 		err = fmt.Errorf("detected %d corrupted files", p.corrupted)
