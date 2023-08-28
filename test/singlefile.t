@@ -8,7 +8,7 @@ Test that summer works fine when given a file instead of a directory.
   "./empty": writing checksum \(checksum:0, mtime:\d+\) (re)
   0s: 0 matched, 0 modified, 1 new, 0 corrupted
 
-  $ summer -v verify .
+  $ summer --parallel=1 -v verify .
   "empty": match \(checksum:0, mtime:\d+\) (re)
   "hola": missing checksum attribute
   0s: 1 matched, 0 modified, 1 new, 0 corrupted
@@ -16,7 +16,7 @@ Test that summer works fine when given a file instead of a directory.
   $ summer update ./hola
   0s: 0 matched, 0 modified, 1 new, 0 corrupted
 
-  $ summer -v verify .
+  $ summer --parallel=1 -v verify .
   "empty": match \(checksum:0, mtime:\d+\) (re)
   "hola": match \(checksum:239059f6, mtime:\d+\) (re)
   0s: 2 matched, 0 modified, 0 new, 0 corrupted

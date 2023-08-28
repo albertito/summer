@@ -19,7 +19,7 @@ jobs:
         with:
           go-version: ">=1.20"
       - name: install dependencies
-        run: sudo apt install -y python3-cram
+        run: sudo apt install -y python3-cram xattr
 
       - name: test
         run: ./test/cover.sh

@@ -58,16 +58,17 @@ Editing the file makes us ignore the previous checksum.
   $ summer verify .
   0s: 3 matched, 0 modified, 0 new, 0 corrupted
 
-Check verbose and quiet.
+Check verbose and quiet. For verbose, use --parallel=1 to ensure reproducible
+output.
 
   $ touch denuevo
-  $ summer -v verify .
+  $ summer --parallel=1 -v verify .
   "denuevo": missing checksum attribute
   "empty": match \(checksum:0, mtime:\d+\) (re)
   "hola": match \(checksum:916db13f, mtime:\d+\) (re)
   "nueva": match \(checksum:91f3a28e, mtime:\d+\) (re)
   0s: 3 matched, 0 modified, 1 new, 0 corrupted
-  $ summer -v generate .
+  $ summer --parallel=1 -v generate .
   "denuevo": writing checksum \(checksum:0, mtime:\d+\) (re)
   0s: 0 matched, 0 modified, 1 new, 0 corrupted
   $ summer -q verify .
@@ -79,7 +80,7 @@ Check verbose and quiet.
 Check that symlinks are ignored.
 
   $ ln -s hola thisisasymlink
-  $ summer -v verify .
+  $ summer --parallel=1 -v verify .
   "empty": match \(checksum:0, mtime:\d+\) (re)
   "hola": match \(checksum:916db13f, mtime:\d+\) (re)
   "nueva": match \(checksum:91f3a28e, mtime:\d+\) (re)
@@ -87,7 +88,7 @@ Check that symlinks are ignored.
 
 Check that the root path doesn't confuse us.
 
-  $ summer -v verify $PWD
+  $ summer --parallel=1 -v verify $PWD
   "/.*/empty": match \(checksum:0, mtime:\d+\) (re)
   "/.*/hola": match \(checksum:916db13f, mtime:\d+\) (re)
   "/.*/nueva": match \(checksum:91f3a28e, mtime:\d+\) (re)

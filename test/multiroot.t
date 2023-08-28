@@ -24,9 +24,10 @@ Test that individual files work well as roots (common use case).
   0s: 5 matched, 0 modified, 0 new, 0 corrupted
 
 
-Check the order is as expected.
+Check the order is as expected (when parallel=1, otherwise the order is not
+reproducible).
 
-  $ summer -v update A B C
+  $ summer --parallel=1 -v update A B C
   "A/a1": match \(checksum:0, mtime:\d+\) (re)
   "A/a2": match \(checksum:0, mtime:\d+\) (re)
   "B/b1": match \(checksum:0, mtime:\d+\) (re)
@@ -39,14 +40,14 @@ Check how we handle getting an error in the middle.
 
   $ chmod 0000 B/b1
 
-  $ summer -v verify A B C
+  $ summer --parallel=1 -v verify A B C
   "A/a1": match \(checksum:0, mtime:\d+\) (re)
   "A/a2": match \(checksum:0, mtime:\d+\) (re)
   0s: 2 matched, 0 modified, 0 new, 0 corrupted
   open B/b1: permission denied
   [1]
 
-  $ summer -v update A B C
+  $ summer --parallel=1 -v update A B C
   "A/a1": match \(checksum:0, mtime:\d+\) (re)
   "A/a2": match \(checksum:0, mtime:\d+\) (re)
   0s: 2 matched, 0 modified, 0 new, 0 corrupted

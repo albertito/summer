@@ -38,6 +38,8 @@ No arguments.
     -forcetty
       \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
+    -parallel int
+      \tnumber of files to process in parallel (0 = number of CPUs) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
     -x\tdon't cross filesystem boundaries (esc)
@@ -80,6 +82,8 @@ Too few arguments.
     -forcetty
       \tforce TTY output (esc)
     -n\tdry-run mode (do not write anything) (esc)
+    -parallel int
+      \tnumber of files to process in parallel (0 = number of CPUs) (esc)
     -q\tquiet mode (esc)
     -v\tverbose mode (list each file) (esc)
     -x\tdon't cross filesystem boundaries (esc)

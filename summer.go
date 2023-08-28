@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 
 	"golang.org/x/term"
 )
@@ -47,6 +48,8 @@ var (
 	forceTTY      = flag.Bool("forcetty", false, "force TTY output")
 	exclude       = &RepeatedStringFlag{}
 	excludeRe     = &RepeatedStringFlag{}
+	parallel      = flag.Int("parallel", 0,
+		"number of files to process in parallel (0 = number of CPUs)")
 )
 
 var options = struct {
@@ -64,6 +67,9 @@ var options = struct {
 
 	// Regexp patterns to exclude.
 	excludeRe []*regexp.Regexp
+
+	// How many files to process in parallel.
+	parallel int
 }{}
 
 func Usage() {
@@ -92,6 +98,11 @@ func main() {
 
 	for _, s := range *excludeRe {
 		options.excludeRe = append(options.excludeRe, regexp.MustCompile(s))
+	}
+
+	options.parallel = *parallel
+	if options.parallel == 0 {
+		options.parallel = runtime.NumCPU()
 	}
 
 	op := flag.Arg(0)
