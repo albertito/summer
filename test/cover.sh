@@ -12,6 +12,8 @@ export BUILDARGS="-cover"
 # Coverage tests require Go >= 1.20.
 go version
 
+go test -cover ../... -args -test.gocoverdir="${GOCOVERDIR?}"
+
 ./test.sh
 
 go tool covdata percent -i="${GOCOVERDIR?}"
