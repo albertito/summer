@@ -12,7 +12,7 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -24,6 +24,10 @@ jobs:
       - name: test
         run: ./test/cover.sh
         timeout-minutes: 2
+
+      - name: race
+        run: ./test/race.sh
+        timeout-minutes: 5
 
       - name: upload coverage codecov
         uses: codecov/codecov-action@v3
