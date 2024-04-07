@@ -9,4 +9,4 @@ cd "$(realpath "$(dirname "$0")" )"
 TARGETS="${*:-./*.t}"
 
 # shellcheck disable=SC2086
-cram3 $TARGETS
+cram3 $CRAM3OPTIONS $TARGETS
