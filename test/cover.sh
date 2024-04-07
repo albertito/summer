@@ -7,12 +7,12 @@ export GOCOVERDIR="$PWD/.cover/"
 rm -rf "${GOCOVERDIR?}"
 mkdir -p "${GOCOVERDIR?}"
 
-export BUILDARGS="-cover"
+export BUILDARGS="-cover -covermode=count"
 
 # Coverage tests require Go >= 1.20.
 go version
 
-go test -cover ../... -args -test.gocoverdir="${GOCOVERDIR?}"
+go test -cover ../... -covermode=count -args -test.gocoverdir="${GOCOVERDIR?}"
 
 ./test.sh
 
