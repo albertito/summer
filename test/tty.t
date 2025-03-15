@@ -12,4 +12,4 @@ In this test we force tty output, and check the output is as expected.
 
   $ summer -forcetty -n generate .
   \r (no-eol) (esc)
-  0s: 0 matched, 0 modified, 3 new, 0 corrupted
+  0s: 0 matched, 0 modified, 3 new, 0 corrupted  

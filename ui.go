@@ -101,10 +101,21 @@ func (p *Progress) print(last bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
+	// When outputting to a TTY (where we do \r), we add two spaces at the end
+	// of each line, as a workaround for when the duration is shorter than the
+	// previous one, the old characters are still visible.
+	//
+	// This can happen in the following situations:
+	//
+	// 1m59s: 0 matched, 0 modified, 0 new, 0 corrupted
+	// 2m0s: 0 matched, 0 modified, 0 new, 0 corruptedd     <-- extra 'd'
+	// 1h59m59s: 0 matched, 0 modified, 0 new, 0 corrupted
+	// 2h0m0s: 0 matched, 0 modified, 0 new, 0 corrupteded  <-- extra 'ed'
+
 	prefix := "\r"
-	suffix := ""
+	suffix := "  "
 	if last {
-		suffix = "\n"
+		suffix = "  \n"
 	}
 
 	// Usually we just overwrite the previous line.
