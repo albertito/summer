@@ -41,6 +41,10 @@ No arguments.
     -parallel int
       \tnumber of files to process in parallel (0 = number of CPUs) (esc)
     -q\tquiet mode (esc)
+    -subsetpct uint
+      \tpercentage of files to process (0 = none, 100 = all) (default 100) (esc)
+    -subsetseed uint
+      \tseed for the subset selection PRNG, useful for testing (0 = random) (esc)
     -v\tverbose mode (list each file) (esc)
     -x\tdon't cross filesystem boundaries (esc)
   [1]
@@ -85,6 +89,10 @@ Too few arguments.
     -parallel int
       \tnumber of files to process in parallel (0 = number of CPUs) (esc)
     -q\tquiet mode (esc)
+    -subsetpct uint
+      \tpercentage of files to process (0 = none, 100 = all) (default 100) (esc)
+    -subsetseed uint
+      \tseed for the subset selection PRNG, useful for testing (0 = random) (esc)
     -v\tverbose mode (list each file) (esc)
     -x\tdon't cross filesystem boundaries (esc)
   [1]

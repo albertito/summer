@@ -13,6 +13,11 @@ import (
 // can't easily simulate Read seeing an "xattr not found" in an end-to-end
 // test.
 
+func init() {
+	// Initialize the subset options, since they are used as part of the walk.
+	options.subset, _ = NewSubset()
+}
+
 func TestDBReadError(t *testing.T) {
 	f, err := os.Open("/dev/null")
 	if err != nil {

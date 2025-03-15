@@ -70,6 +70,9 @@ var options = struct {
 
 	// How many files to process in parallel.
 	parallel int
+
+	// Subset to decide which files to process.
+	subset *Subset
 }{}
 
 func Usage() {
@@ -103,6 +106,11 @@ func main() {
 	options.parallel = *parallel
 	if options.parallel == 0 {
 		options.parallel = runtime.NumCPU()
+	}
+
+	options.subset, err = NewSubset()
+	if err != nil {
+		Fatalf("%v", err)
 	}
 
 	op := flag.Arg(0)

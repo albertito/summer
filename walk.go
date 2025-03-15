@@ -26,6 +26,11 @@ func openAndInfo(path string, d fs.DirEntry, err error, rootDev deviceID) (bool,
 		return false, nil, nil, nil
 	}
 
+	// If we are only processing a subset of the files, skip some of them.
+	if !options.subset.ShouldProcess() {
+		return false, nil, nil, nil
+	}
+
 	// It is important that we obtain fs.FileInfo at this point, before
 	// reading any of the file contents, because the file could be modified
 	// while we do so. See the comment on ChecksumV1.ModTimeUsec for more
