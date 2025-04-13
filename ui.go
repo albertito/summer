@@ -137,8 +137,9 @@ func (p *Progress) PrintCorrupted(path string, expected, got ChecksumV1) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.corrupted++
-	Printf("%q: FILE CORRUPTED - expected:%x, got:%x",
-		path, expected.CRC32C, got.CRC32C)
+	Printf("%q: FILE CORRUPTED - expected: %x, got: %x (mtime: %d = %s)",
+		path, expected.CRC32C, got.CRC32C, got.ModTimeUsec,
+		time.UnixMicro(got.ModTimeUsec).Format(time.RFC3339Nano))
 }
 
 func (p *Progress) PrintNew(path string, cs ChecksumV1) {

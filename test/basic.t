@@ -36,7 +36,7 @@ Corrupt a file by changing its contents without changing the mtime.
   $ touch --date="$OLD_MTIME" hola
 
   $ summer verify .
-  "hola": FILE CORRUPTED - expected:239059f6, got:916db13f
+  "hola": FILE CORRUPTED - expected: 239059f6, got: 916db13f \(mtime: \d+\ = [\dTZ.:-]+\) (re)
   0s: 2 matched, 0 modified, 0 new, 1 corrupted
   detected 1 corrupted files
   [1]
@@ -45,7 +45,7 @@ Check that "update" also detects the corruption, and doesn't just step over
 it.
 
   $ summer update .
-  "hola": FILE CORRUPTED - expected:239059f6, got:916db13f
+  "hola": FILE CORRUPTED - expected: 239059f6, got: 916db13f \(mtime: \d+\ = [\dTZ.:-]+\) (re)
   0s: 2 matched, 0 modified, 0 new, 1 corrupted
   detected 1 corrupted files
   [1]
