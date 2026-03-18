@@ -1,0 +1,40 @@
+
+Note this runs inside unshare so we can mount things.
+
+Prepare the directories, files and mounts.
+
+  $ mkdir -p root/mnt root/dir
+  $ echo aaa > root/file1
+  $ echo bbb > root/dir/file2
+  $ mount -t tmpfs none root/mnt
+  $ echo ccc > root/mnt/file3
+  $ mkdir root/mnt/subdir
+  $ echo ddd > root/mnt/subdir/file4
+
+Generate with -x: only root device files should get checksums.
+
+  $ alias summer="$TESTDIR/../summer"
+  $ summer -v --parallel=1 -x generate root
+  "root/dir/file2": writing checksum \(checksum:\w+, mtime:\d+\) (re)
+  "root/file1": writing checksum \(checksum:\w+, mtime:\d+\) (re)
+  0s: 0 matched, 0 modified, 2 new, 0 corrupted
+
+Verify with -x: should see only root device files.
+
+  $ summer -v --parallel=1 -x verify root
+  "root/dir/file2": match \(checksum:\w+, mtime:\d+\) (re)
+  "root/file1": match \(checksum:\w+, mtime:\d+\) (re)
+  0s: 2 matched, 0 modified, 0 new, 0 corrupted
+
+Verify without -x: root device files match, mount files are missing.
+
+  $ summer -v --parallel=1 verify root
+  "root/dir/file2": match \(checksum:\w+, mtime:\d+\) (re)
+  "root/file1": match \(checksum:\w+, mtime:\d+\) (re)
+  "root/mnt/file3": missing checksum attribute
+  "root/mnt/subdir/file4": missing checksum attribute
+  0s: 2 matched, 0 modified, 2 new, 0 corrupted
+
+Unmount so the test directory can be gracefully cleaned up.
+
+  $ umount root/mnt

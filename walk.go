@@ -22,6 +22,19 @@ func openAndInfo(path string, d fs.DirEntry, err error, rootDev deviceID) (bool,
 	if err != nil {
 		return false, nil, nil, err
 	}
+
+	// Check filesystem boundaries for directories, so we skip entire
+	// subtrees on other filesystems without descending into them.
+	if options.oneFilesystem && d.IsDir() {
+		info, err := d.Info()
+		if err != nil {
+			return false, nil, nil, err
+		}
+		if rootDev != getDevice(info) {
+			return false, nil, nil, fs.SkipDir
+		}
+	}
+
 	if d.IsDir() || !d.Type().IsRegular() {
 		return false, nil, nil, nil
 	}
@@ -43,11 +56,6 @@ func openAndInfo(path string, d fs.DirEntry, err error, rootDev deviceID) (bool,
 	fd, err := os.Open(path)
 	if err != nil {
 		return true, nil, nil, err
-	}
-
-	if options.oneFilesystem && rootDev != getDevice(info) {
-		fd.Close()
-		return false, nil, nil, fs.SkipDir
 	}
 
 	return true, fd, info, nil
